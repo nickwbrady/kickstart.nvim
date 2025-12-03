@@ -720,11 +720,16 @@ require('lazy').setup({
           cmd = {
             'clangd',
             '--log=verbose',
-            '--compile-commands-dir=./build',
+            '--compile-commands-dir=build',
           },
+          filetypes = { 'cpp' },
+          root_markers = { '.clangd', '.git' },
         },
         -- gopls = {},
-        -- pyright = {},
+        pyright = {
+          filetypes = { 'python' },
+          root_markers = { 'pyproject.toml', 'setup.py', 'requirements.txt', '.git' },
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -737,8 +742,13 @@ require('lazy').setup({
         ruff = {
           cmd = { 'uv run ruff', 'server' },
           filetypes = { 'python' },
+          root_markers = { 'pyproject.toml', 'setup.py', 'requirements.txt', '.git' },
           settings = {
             organizeImports = 'onSave',
+            lineLength = 120,
+            extendExclude = {
+              '*.ipynb',
+            },
           },
         },
         lua_ls = {
