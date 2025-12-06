@@ -111,17 +111,13 @@ vim.o.mouse = ''
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
 
--- Mixture of claude recommendations and some stuff that was working
--- Basically uses wl-clipboard for local copy-paste (as pasting in neovim
--- in tmux doesn't work locally) and falls back to OSC 52 when remote
-local function paste_cmd()
-  -- Check if we're local (not over SSH) and have wl-paste
-  if not os.getenv 'SSH_TTY' and vim.fn.executable 'wl-paste' == 1 then
-    return { 'wl-paste', '--no-newline' }
-  end
-  -- Fall back to OSC 52 paste for remote
-  return require('vim.ui.clipboard.osc52').paste '+'
-end
+--- Sync clipboard between OS and Neovim.
+---  Schedule the setting after `UiEnter` because it can increase startup-time.
+---  Remove this option if you want your OS clipboard to remain independent.
+---  See `:help 'clipboard'
+-- vim.schedule(function()
+--   vim.o.clipboard = 'unnamedplus'
+-- end)
 
 vim.g.clipboard = {
   name = 'OSC 52',
@@ -130,17 +126,13 @@ vim.g.clipboard = {
     ['*'] = require('vim.ui.clipboard.osc52').copy '*',
   },
   paste = {
-    ['+'] = paste_cmd,
-    ['*'] = paste_cmd,
+    ['+'] = require('vim.ui.clipboard.osc52').copy '+',
+    ['*'] = require('vim.ui.clipboard.osc52').copy '*',
   },
 }
 
 vim.g.loaded_clipboard_provider = nil
 vim.cmd 'runtime autoload/provider/clipboard.vim'
-
-vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
-end)
 
 -- Enable break indent
 vim.o.shiftwidth = 2
