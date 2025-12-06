@@ -209,6 +209,12 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Git keymaps
+vim.keymap.set('n', '<leader>gg', '<cmd>Git<CR>', { desc = '[G]it Fugitive' })
+vim.keymap.set('n', '<leader>gd', '<cmd>Git difftool<CR>', { desc = 'Git [D]ifftool' })
+vim.keymap.set('n', '<leader>gt', '<cmd>Git difftool -y<CR>', { desc = 'Git Difftool [T]ab' })
+vim.keymap.set('n', '<leader>gb', '<cmd>Git blame<CR>', { desc = 'Git [B]lame' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -410,6 +416,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>g', group = '[G]it' },
       },
     },
   },
