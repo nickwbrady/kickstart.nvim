@@ -289,8 +289,27 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
+
+  -- vim-fugitive: does git stuff with :Git
+  -- Use:
+  --     :G or :Git - Bring up a summary window like git-status where file diffs can be managed
+  --     Status mode:
+  --         `=` toggles an inline diff for the file under the cursor
+  --         `s`/`u` stages/unstages the file/chunk under the cursor
+  --         `o`/`gO`/`O`/`p` opens the filr under the cursor in a new split/vertical split/tab/preview window
+  --         `(`/`)` jumps to the previous/next file, hunk, or revision
+  --         `c[`/`c]` jumps to previous/next hunk expanding inline diffs automatically
+  --     :Git blame - Show blame in vertical column
+  --         `gq` closes the blame and then :Gedit can be used to return to the work tree version
+  --         `<CR>` closes blame and jumps to the patch that added the line
+  --         `o`/`O`/`p` jumps to the patch or blob in a horizontal split/new tab/preview window
+  --         `A`/`C`/`D` resizes to the end of the author/commit/date-time column
+  --     :Git difftool [args] - Invoke git diff [args] and load the changes into a quickfix list.
+  --     :Git difftool -y [args] - Invoke git diff [args] and open each changed file in a new tab.
   'tpope/vim-fugitive',
+  -- vim-sleuth: adjusts shiftwidth and expandtab based on the file
   'tpope/vim-sleuth',
+  -- Comment.nvim: comments with :gc and :gb
   'numToStr/Comment.nvim',
 
   -- NOTE: Plugins can also be added by using a table,
