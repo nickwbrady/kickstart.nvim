@@ -757,10 +757,9 @@ require('lazy').setup({
             '--log=verbose',
             '--compile-commands-dir=build',
           },
-          filetypes = { 'cpp' },
-          root_markers = { '.clangd', '.git' },
+          filetypes = { 'cpp', 'cuda' },
+          root_markers = { '.clangd', '.clang-tidy', '.clang-format', '.git' },
         },
-        -- gopls = {},
         pyright = {
           filetypes = { 'python' },
           root_markers = { 'pyproject.toml', 'setup.py', 'requirements.txt', '.git' },
@@ -775,7 +774,7 @@ require('lazy').setup({
         -- ts_ls = {},
         --
         ruff = {
-          cmd = { 'uv run ruff', 'server' },
+          cmd = { 'ruff', 'server' },
           filetypes = { 'python' },
           root_markers = { 'pyproject.toml', 'setup.py', 'requirements.txt', '.git' },
           settings = {
@@ -800,6 +799,18 @@ require('lazy').setup({
             },
           },
         },
+        cmake = {
+          root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake', '.git' },
+        },
+        -- Some others that may be useful at some point:
+        -- docker_compose_language_server = {},
+        -- docker_language_server = {},
+        -- gitlab_ci_ls = {},
+        -- ty = {
+        --   cmd = { 'ty', 'server' },
+        --   filetypes = { 'python' },
+        --   root_markers = { "ty.toml", "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
+        -- },
       }
 
       -- Ensure the servers and tools above are installed
