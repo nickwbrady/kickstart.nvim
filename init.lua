@@ -539,7 +539,17 @@ require('lazy').setup({
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
-    opts = {},
+    opts = {
+      enabled = false,
+      code = {
+        -- Whether to include the language icon above code blocks.
+        language_icon = true,
+        -- Whether to include the language name above code blocks.
+        language_name = false,
+        -- Whether to include the language info above code blocks.
+        language_info = true,
+      },
+    },
   },
 
   -- LSP Plugins
@@ -766,7 +776,7 @@ require('lazy').setup({
           settings = {
             python = {
               analysis = {
-                typeCheckingMode = "off",
+                typeCheckingMode = 'off',
               },
             },
           },
@@ -780,9 +790,9 @@ require('lazy').setup({
             lineLength = 140,
             lint = {
               ignore = {
-                "E226",  -- Spaces around arithmetic operations
-                "E501",  -- Line length
-                "E402",  -- Module import not at top of file
+                'E226', -- Spaces around arithmetic operations
+                'E501', -- Line length
+                'E402', -- Module import not at top of file
               },
             },
             extendExclude = {
