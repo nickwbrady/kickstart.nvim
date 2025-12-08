@@ -643,20 +643,20 @@ require('lazy').setup({
             },
           },
         },
-        lua_ls = {
-          -- cmd = { ... },
-          -- filetypes = { ... },
-          -- capabilities = {},
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
-            },
-          },
-        },
+        -- lua_ls = {
+        --   -- cmd = { ... },
+        --   -- filetypes = { ... },
+        --   -- capabilities = {},
+        --   settings = {
+        --     Lua = {
+        --       completion = {
+        --         callSnippet = 'Replace',
+        --       },
+        --       -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+        --       -- diagnostics = { disable = { 'missing-fields' } },
+        --     },
+        --   },
+        -- },
         cmake = {
           root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake', '.git' },
         },
@@ -875,7 +875,8 @@ require('lazy').setup({
     -- 'folke/tokyonight.nvim',
     -- 'ishan9299/nvim-solarized-lua',
     -- 'sainnhe/gruvbox-material',
-    'loctvl842/monokai-pro.nvim',
+    -- 'loctvl842/monokai-pro.nvim',
+    'sainnhe/everforest',
     lazy = false,
     priority = 1000,
     -- -@type tokyonight.config
@@ -891,6 +892,9 @@ require('lazy').setup({
       -- vim.g.solarized_statusline = 'flat'
       -- vim.g.gruvbox_material_enable_italic = true
       -- vim.g.gruvbox_material_cursor = 'purple'
+      vim.g.everforest_enable_italic = true
+      vim.g.everforest_background = 'soft'
+      vim.g.everforest_better_performance = 1
 
       -- Quite a bit of logic to watch the color-file and auto-switch when it changes:
       -- See https://felix-kling.de/blog/2021/linux-toggle-dark-mode.html
@@ -902,7 +906,8 @@ require('lazy').setup({
         -- vim.cmd.colorscheme 'tokyonight-night'
         -- vim.cmd.colorscheme 'tokyonight-day'
         -- vim.cmd.colorscheme 'gruvbox-material'
-        vim.cmd.colorscheme 'monokai-pro-spectrum' -- classic | octagon | pro | machine | ristretto | spectrum
+        -- vim.cmd.colorscheme 'monokai-pro-spectrum' -- classic | octagon | pro | machine | ristretto | spectrum
+        vim.cmd.colorscheme 'everforest'
       end
       local w = vim.loop.new_fs_event()
       local on_change
