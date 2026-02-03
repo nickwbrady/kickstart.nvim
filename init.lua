@@ -180,11 +180,11 @@ require('lazy').setup({
   --         `A`/`C`/`D` resizes to the end of the author/commit/date-time column
   --     :Git difftool [args] - Invoke git diff [args] and load the changes into a quickfix list.
   --     :Git difftool -y [args] - Invoke git diff [args] and open each changed file in a new tab.
-  { 'tpope/vim-fugitive', opts = {} },
+  'tpope/vim-fugitive',
   -- vim-sleuth: adjusts shiftwidth and expandtab based on the file
-  { 'tpope/vim-sleuth', opts = {} },
+  'tpope/vim-sleuth',
   -- Comment.nvim: comments with :gc and :gb
-  { 'numToStr/Comment.nvim', opts = {} },
+  'numToStr/Comment.nvim',
 
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
@@ -651,7 +651,8 @@ require('lazy').setup({
           },
         },
         cmake = {
-          root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake', '.git' },
+          -- root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake', '.git' },
+          root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake' },
         },
         -- Some others that may be useful at some point:
         -- docker_compose_language_server = {},
