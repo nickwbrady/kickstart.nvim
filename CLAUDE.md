@@ -54,10 +54,18 @@ Lua files must follow `.stylua.toml`:
 
 ## External Dependencies
 
-Required: git, make, unzip, gcc, ripgrep (rg)
+Required: git, make, unzip, gcc, ripgrep (rg), tree-sitter-cli
 Optional: fd-find, Nerd Font, clipboard tool (xclip/xsel)
 
 Neovim version: 0.11+ required
+
+**Quick install:** Run `./install-deps.sh` to check and install dependencies.
+
+**tree-sitter-cli:** Required for compiling treesitter parsers. Install via:
+```bash
+npm install -g tree-sitter-cli   # or
+cargo install tree-sitter-cli
+```
 
 ## LSP Configuration
 

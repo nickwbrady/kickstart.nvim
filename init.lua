@@ -974,12 +974,12 @@ require('lazy').setup({
     -- automatically update the parsers with every new release of treesitter
     build = ':TSUpdate',
     lazy = false,
-    config = function(_, opts)
-    -- config = function()
-      require('nvim-treesitter.install').prefer_git = true -- force treesitter to clone parser repos using git instead of downloading tarballs
-      require('nvim-treesitter').install { 'bash', 'cpp', 'markdown', 'markdown_inline', 'python' }
+    config = function()
+      -- Ensure parsers are installed (runs async, only installs if missing)
+      -- Requires tree-sitter CLI - run ./install-deps.sh or: npm install -g tree-sitter-cli
+      require('nvim-treesitter').install { 'bash', 'c', 'cpp', 'lua', 'markdown', 'markdown_inline', 'python' }
       vim.api.nvim_create_autocmd('FileType', { -- enable highlighting, folding, and indentation
-        pattern = { 'bash', 'cpp', 'markdown', 'python' }, -- enable highlighting for these filetypes
+        pattern = { 'bash', 'c', 'cpp', 'lua', 'markdown', 'python' }, -- enable highlighting for these filetypes
         callback = function()
           vim.treesitter.start()
           vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()' -- enable folding with this line and the next
