@@ -55,7 +55,7 @@ vim.o.timeoutlen = 300 -- Decrease mapped sequence wait time
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
-vim.keymap.set('', 'vv', '<C-w>v<C-w>l') -- vv splits the window vertically
+-- vim.keymap.set('', 'vv', '<C-w>v<C-w>l') -- vv splits the window vertically
 
 vim.o.list = true
 vim.opt.listchars = {
@@ -68,13 +68,14 @@ vim.opt.listchars = {
 
 vim.o.inccommand = 'split' -- Preview substitutions live, as you type!
 vim.o.cursorline = true -- Show which line your cursor is on
+vim.o.showmatch = true -- Briefly jump to a paren once it's balanced
 vim.o.scrolloff = 4 -- Minimal number of screen lines to keep above and below the cursor.
 vim.o.wrap = false -- Don't wrap text
 vim.o.confirm = true -- raise dialog asking to save the current file instead of throwing error
 vim.opt.foldmethod = 'indent' -- allow us to fold on indents
 vim.opt.foldlevel = 99 -- but don't fold anything right away!
 vim.opt.autoread = false -- Don't automatically re-read changed files, ask!
-vim.opt.gdefault = true -- /g on by default, writing /g turns it off.
+vim.opt.gdefault = true -- In :substitute /g on by default, writing /g turns it off.
 
 -- [[ Basic Keymaps ]]
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>') -- Clear highlights on search when pressing <Esc> in normal mode
@@ -572,35 +573,6 @@ require('lazy').setup({
         end,
       })
 
-      -- -- Diagnostic Config
-      -- -- See :help vim.diagnostic.Opts
-      -- vim.diagnostic.config {
-      --   severity_sort = true,
-      --   float = { border = 'rounded', source = 'if_many' },
-      --   underline = { severity = vim.diagnostic.severity.ERROR },
-      --   signs = vim.g.have_nerd_font and {
-      --     text = {
-      --       [vim.diagnostic.severity.ERROR] = '󰅚 ',
-      --       [vim.diagnostic.severity.WARN] = '󰀪 ',
-      --       [vim.diagnostic.severity.INFO] = '󰋽 ',
-      --       [vim.diagnostic.severity.HINT] = '󰌶 ',
-      --     },
-      --   } or {},
-      --   virtual_text = {
-      --     source = 'if_many',
-      --     spacing = 2,
-      --     format = function(diagnostic)
-      --       local diagnostic_message = {
-      --         [vim.diagnostic.severity.ERROR] = diagnostic.message,
-      --         [vim.diagnostic.severity.WARN] = diagnostic.message,
-      --         [vim.diagnostic.severity.INFO] = diagnostic.message,
-      --         [vim.diagnostic.severity.HINT] = diagnostic.message,
-      --       }
-      --       return diagnostic_message[diagnostic.severity]
-      --     end,
-      --   },
-      -- }
-
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -650,10 +622,10 @@ require('lazy').setup({
             },
           },
         },
-        cmake = {
-          -- root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake', '.git' },
-          root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake' },
-        },
+        -- cmake = {
+        --   -- root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake', '.git' },
+        --   root_markers = { 'CMakePresets.json', 'CMakeUserPresets.json', 'build', 'cmake' },
+        -- },
         -- Some others that may be useful at some point:
         -- docker_compose_language_server = {},
         -- docker_language_server = {},
@@ -733,7 +705,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, python = true, bash = true, lua = true, markdown = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
@@ -864,6 +836,44 @@ require('lazy').setup({
   },
 
   {
+    'kana/vim-arpeggio',
+    lazy = false,
+    config = function(_, opts)
+      vim.fn['arpeggio#load']()
+
+      -- j and k at the same time instead of escape to leave edit mode
+      vim.fn['arpeggio#map']('i', '', 1, 'jk', '<Esc>')
+
+      -- Navigation: w+hjkl to window movement.
+      vim.fn['arpeggio#map']('nv', '', 1, 'wh', '<C-W>h')
+      vim.fn['arpeggio#map']('nv', '', 1, 'wj', '<C-W>j')
+      vim.fn['arpeggio#map']('nv', '', 1, 'wk', '<C-W>k')
+      vim.fn['arpeggio#map']('nv', '', 1, 'wl', '<C-W>l')
+
+      -- Navigation: f+hjkl to home/pgup/down/end
+      vim.fn['arpeggio#map']('nv', '', 1, 'fh', '^')
+      vim.fn['arpeggio#map']('nv', '', 1, 'fj', '<C-D>')
+      vim.fn['arpeggio#map']('nv', '', 1, 'fk', '<C-U>')
+      vim.fn['arpeggio#map']('nv', '', 1, 'fl', '$')
+
+      -- Scrolling: e+jk to down/up scrolling.
+      vim.fn['arpeggio#map']('nv', '', 1, 'ej', '<C-E>')
+      vim.fn['arpeggio#map']('nv', '', 1, 'ek', '<C-Y>')
+
+      -- " jo opens the ctrl-p file opener, fe the NERDTree.
+      -- call arpeggio#map('niv', '', 1, 'jo', ':CtrlP<cr>')
+
+      -- " jc toggles the current line's comment state.
+      vim.fn['arpeggio#map']('n', '', 1, 'jc', 'gcc')
+      vim.fn['arpeggio#map']('v', '', 1, 'jc', 'gc')
+      -- vim.fn['arpeggio#map']('i', '', 1, 'jc', '<ESC>gcca')
+
+      -- " f+n for stopping highlighting of search results.
+      vim.fn['arpeggio#map']('n', '', 1, 'fn', ':noh<CR>')
+    end,
+  },
+
+  {
     -- 'folke/tokyonight.nvim',
     -- 'ishan9299/nvim-solarized-lua',
     -- 'sainnhe/gruvbox-material',
@@ -939,7 +949,7 @@ require('lazy').setup({
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- require('mini.surround').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -958,44 +968,24 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    -- dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
-    -- build = ':TSUpdate',
-    -- main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    -- -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    -- opts = {
-    --   ensure_installed = { 'bash', 'c', 'diff', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'vim', 'vimdoc', 'python', 'yaml' },
-    --   auto_install = true,
-    --   sync_install = false,
-    --   highlight = {
-    --     enable = true,
-    --   },
-    --   indent = { enable = true },
-    --   incremental_selection = {
-    --     enable = true,
-    --     keymaps = { init_selection = '<c-space>', node_incremental = '<c-space>', node_decremental = '<M-space>' },
-    --   },
-    --   textobjects = {
-    --     select = {
-    --       enable = true,
-    --       lookahead = true,
-    --       keymaps = { ['ia'] = '@parameter.inner', ['af'] = '@function.outer', ['ac'] = '@class.outer' },
-    --     },
-    --   },
-    -- },
-    -- -- There are additional nvim-treesitter modules that you can use to interact
-    -- -- with nvim-treesitter. You should go explore a few and see what interests you:
-    -- --
-    -- --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-    -- --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-    -- --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-    config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'python', 'yaml' }
-      require('nvim-treesitter').install(filetypes)
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = filetypes,
-        callback = function() vim.treesitter.start() end,
+    -- automatically update the parsers with every new release of treesitter
+    build = ':TSUpdate',
+    lazy = false,
+    config = function(_, opts)
+    -- config = function()
+      require('nvim-treesitter.install').prefer_git = true -- force treesitter to clone parser repos using git instead of downloading tarballs
+      require('nvim-treesitter').install { 'bash', 'cpp', 'markdown', 'markdown_inline', 'python' }
+      vim.api.nvim_create_autocmd('FileType', { -- enable highlighting, folding, and indentation
+        pattern = { 'bash', 'cpp', 'markdown', 'python' }, -- enable highlighting for these filetypes
+        callback = function()
+          vim.treesitter.start()
+          vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()' -- enable folding with this line and the next
+          vim.wo[0][0].foldmethod = 'expr'
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" -- enable treesitter-based indentation
+        end,
       })
     end,
   },
