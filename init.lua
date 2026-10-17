@@ -122,6 +122,19 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Prose: soft-wrap at word boundaries and spell-check (markdown, text, git commits)
+vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Prose settings',
+  group = vim.api.nvim_create_augroup('prose-settings', { clear = true }),
+  pattern = { 'markdown', 'text', 'gitcommit' },
+  callback = function()
+    vim.wo[0][0].wrap = true
+    vim.wo[0][0].linebreak = true
+    vim.wo[0][0].spell = true
+    vim.bo.spelllang = 'en_us'
+  end,
+})
+
 -- [[ Basic Autocommands ]]
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -406,13 +419,16 @@ require('lazy').setup({
 
   {
     'MeanderingProgrammer/render-markdown.nvim',
+    ft = { 'markdown' },
+    keys = { { '<leader>tm', '<cmd>RenderMarkdown toggle<CR>', desc = '[T]oggle [M]arkdown rendering' } },
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {
-      enabled = false,
+      enabled = true, -- <leader>tm toggles; insert mode always shows the raw text
+      completions = { blink = { enabled = true } }, -- checkbox/callout completion
       code = {
         -- Whether to include the language icon above code blocks.
         language_icon = true,
@@ -583,6 +599,7 @@ require('lazy').setup({
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
+        marksman = { filetypes = { 'markdown' } }, -- markdown: gO outline, link completion, grd on links
         clangd = {
           cmd = {
             'clangd',
@@ -796,11 +813,11 @@ require('lazy').setup({
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets' },
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
       },
 
       snippets = { preset = 'luasnip' },
@@ -898,12 +915,19 @@ require('lazy').setup({
       vim.g.everforest_background = 'soft'
       vim.g.everforest_better_performance = 1
 
-      -- Quite a bit of logic to watch the color-file and auto-switch when it changes:
+      -- Light/dark follows the terminal: Neovim asks the terminal for its
+      -- background colour at startup (OSC 11) and sets 'background', which
+      -- reloads the colorscheme. The `color` file next to init.lua can force a
+      -- side with `set background=light` or `set background=dark`; `auto`
+      -- (the default) keeps detection on. The file is watched, so editing it
+      -- re-themes running instances too.
       -- See https://felix-kling.de/blog/2021/linux-toggle-dark-mode.html
 
       local colorFile = vim.fn.stdpath 'config' .. '/color'
       local function reload()
-        vim.cmd('source ' .. colorFile)
+        local ok, lines = pcall(vim.fn.readfile, colorFile)
+        local setting = ok and vim.trim(table.concat(lines, '\n')) or 'auto'
+        if setting:match '^set background=' then vim.cmd(setting) end
         -- vim.cmd.colorscheme 'solarized'
         -- vim.cmd.colorscheme 'tokyonight-night'
         -- vim.cmd.colorscheme 'tokyonight-day'
@@ -951,18 +975,7 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       -- require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function() return '%2l:%-2v' end
+      -- (statusline is lualine, configured above; mini.statusline not used)
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
@@ -977,14 +990,17 @@ require('lazy').setup({
     config = function()
       -- Ensure parsers are installed (runs async, only installs if missing)
       -- Requires tree-sitter CLI - run ./install-deps.sh or: npm install -g tree-sitter-cli
-      require('nvim-treesitter').install { 'bash', 'c', 'cpp', 'lua', 'markdown', 'markdown_inline', 'python' }
+      -- Needs Neovim 0.12+, a C compiler and the tree-sitter CLI
+      -- (brew install tree-sitter-cli | apt install tree-sitter-cli).
+      require('nvim-treesitter').install { 'bash', 'c', 'cpp', 'lua', 'markdown', 'markdown_inline', 'python', 'vim', 'vimdoc', 'json', 'yaml', 'toml' }
       vim.api.nvim_create_autocmd('FileType', { -- enable highlighting, folding, and indentation
-        pattern = { 'bash', 'c', 'cpp', 'lua', 'markdown', 'python' }, -- enable highlighting for these filetypes
-        callback = function()
-          vim.treesitter.start()
+        pattern = { 'bash', 'sh', 'c', 'cpp', 'lua', 'markdown', 'python', 'vim', 'json', 'yaml', 'toml' },
+        callback = function(ev)
+          -- pcall: without the parser we fall back to regex highlighting instead of an error on every buffer
+          if not pcall(vim.treesitter.start, ev.buf) then return end
           vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()' -- enable folding with this line and the next
           vim.wo[0][0].foldmethod = 'expr'
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" -- enable treesitter-based indentation
+          vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" -- enable treesitter-based indentation
         end,
       })
     end,

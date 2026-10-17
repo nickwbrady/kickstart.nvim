@@ -49,7 +49,7 @@ Lua files must follow `.stylua.toml`:
 
 **Key files:**
 - `lazy-lock.json` - Plugin version lock file (28 plugins pinned)
-- `color` - Single word file controlling light/dark theme mode
+- `color` - `auto` (follow the terminal background) or `set background=light|dark` to force; watched at runtime
 - `doc/kickstart.txt` - Vim help documentation
 
 ## External Dependencies
@@ -57,14 +57,15 @@ Lua files must follow `.stylua.toml`:
 Required: git, make, unzip, gcc, ripgrep (rg), tree-sitter-cli
 Optional: fd-find, Nerd Font, clipboard tool (xclip/xsel)
 
-Neovim version: 0.11+ required
+Neovim version: 0.12+ required (nvim-treesitter main branch uses 0.12 APIs). Ubuntu apt ships 0.11; install the GitHub release tarball instead (dotfiles bootstrap/linux.sh does this).
 
 **Quick install:** Run `./install-deps.sh` to check and install dependencies.
 
 **tree-sitter-cli:** Required for compiling treesitter parsers. Install via:
 ```bash
-npm install -g tree-sitter-cli   # or
-cargo install tree-sitter-cli
+sudo apt install tree-sitter-cli   # Ubuntu
+brew install tree-sitter-cli       # macOS
+npm install -g tree-sitter-cli     # or cargo install tree-sitter-cli
 ```
 
 ## LSP Configuration

@@ -29,7 +29,11 @@ fi
 if ! command -v tree-sitter &> /dev/null; then
   echo "Installing tree-sitter-cli..."
 
-  if command -v npm &> /dev/null; then
+  if command -v apt-get &> /dev/null; then
+    sudo apt-get install -y tree-sitter-cli
+  elif command -v brew &> /dev/null; then
+    brew install tree-sitter-cli
+  elif command -v npm &> /dev/null; then
     npm install -g tree-sitter-cli
   elif command -v cargo &> /dev/null; then
     cargo install tree-sitter-cli
