@@ -890,30 +890,31 @@ require('lazy').setup({
     end,
   },
 
-  {
-    -- 'folke/tokyonight.nvim',
-    -- 'ishan9299/nvim-solarized-lua',
-    -- 'sainnhe/gruvbox-material',
-    -- 'loctvl842/monokai-pro.nvim',
-    'sainnhe/everforest',
+  { -- Colorscheme: Catppuccin, same palette as the terminal (Ghostty: Latte when light, Macchiato when dark)
+    'catppuccin/nvim',
+    name = 'catppuccin',
     lazy = false,
     priority = 1000,
-    -- -@type tokyonight.config
-    -- opts = { -- tokyonight settings
-    --   styles = {
-    --     comments = { italic = false },
-    --   },
-    -- },
-    -- -@type solarized.config
-    opts = {},
+    opts = {
+      flavour = 'auto', -- pick by 'background', which Neovim sets from the terminal (OSC 11)
+      background = { light = 'latte', dark = 'macchiato' },
+      transparent_background = true, -- keep the terminal's own background so the two match exactly
+      integrations = {
+        blink_cmp = true,
+        fidget = true,
+        gitsigns = true,
+        mason = true,
+        mini = { enabled = true },
+        native_lsp = { enabled = true },
+        render_markdown = true,
+        telescope = { enabled = true },
+        treesitter = true,
+        which_key = true,
+      },
+    },
     config = function(_, opts)
       vim.o.termguicolors = true
-      -- vim.g.solarized_statusline = 'flat'
-      -- vim.g.gruvbox_material_enable_italic = true
-      -- vim.g.gruvbox_material_cursor = 'purple'
-      vim.g.everforest_enable_italic = true
-      vim.g.everforest_background = 'soft'
-      vim.g.everforest_better_performance = 1
+      require('catppuccin').setup(opts)
 
       -- Light/dark follows the terminal: Neovim asks the terminal for its
       -- background colour at startup (OSC 11) and sets 'background', which
@@ -922,20 +923,14 @@ require('lazy').setup({
       -- (the default) keeps detection on. The file is watched, so editing it
       -- re-themes running instances too.
       -- See https://felix-kling.de/blog/2021/linux-toggle-dark-mode.html
-
       local colorFile = vim.fn.stdpath 'config' .. '/color'
       local function reload()
         local ok, lines = pcall(vim.fn.readfile, colorFile)
         local setting = ok and vim.trim(table.concat(lines, '\n')) or 'auto'
         if setting:match '^set background=' then vim.cmd(setting) end
-        -- vim.cmd.colorscheme 'solarized'
-        -- vim.cmd.colorscheme 'tokyonight-night'
-        -- vim.cmd.colorscheme 'tokyonight-day'
-        -- vim.cmd.colorscheme 'gruvbox-material'
-        -- vim.cmd.colorscheme 'monokai-pro-spectrum' -- classic | octagon | pro | machine | ristretto | spectrum
-        vim.cmd.colorscheme 'everforest'
+        vim.cmd.colorscheme 'catppuccin'
       end
-      local w = vim.loop.new_fs_event()
+      local w = vim.uv.new_fs_event()
       local on_change
       local function watch_file(fname) w:start(fname, {}, vim.schedule_wrap(on_change)) end
       on_change = function()
@@ -945,12 +940,6 @@ require('lazy').setup({
       end
       watch_file(colorFile)
       reload()
-
-      -- Unfortunately our solarized theme doesn't export the modern names that minidiff uses,
-      -- so we need to manually link them.
-      vim.api.nvim_set_hl(0, 'MiniDiffSignAdd', { link = 'DiffAdd' })
-      vim.api.nvim_set_hl(0, 'MiniDiffSignChange', { link = 'DiffChange' })
-      vim.api.nvim_set_hl(0, 'MiniDiffSignDelete', { link = 'DiffDelete' })
     end,
   },
 
